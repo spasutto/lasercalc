@@ -277,8 +277,8 @@
         let V0 = Math.sqrt(2*m*g/(Cx*ro*S));
         let ttf = h => (V0/g)*Math.acosh(Math.exp(h*Cx*ro*S/(2*m)));
         let t = ttf(haut-haut/3);
-        let rappv0 = (Math.round(Math.tanh(t/(V0/g))*100)/100);
-        console.log("Vitesse terminale de " + Math.round(V0*3.6) + "km/h " + (rappv0<1?"non acquise":"acquise") + " aux 2/3 de la chute, " + (Math.round(t*10)/10) + "s après le départ");
+        let rappv0 = Math.round(Math.tanh(t/(V0/g))*100);
+        console.log(rappv0+"% de la vitesse terminale (" + Math.round(V0*3.6) + "km/h) acquise aux 2/3 de la chute (" + Math.round(haut-haut/3) + "m), " + (Math.round(t*10)/10) + "s après le départ");
         t = ttf(haut);
         return t;
       }
