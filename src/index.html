@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Calcul Laser</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
+    <style>
+      body, * {
+        font-family: sans-serif;
+      }
+      #zonepage {
+        max-width:310px;
+        margin: auto;
+        padding: 5px;
+        background-color: white;
+      }
+      .contenu {
+        max-width:300px;
+        padding: 8px 5px;
+        background-color: #00afef;
+        text-align: center;
+        border-radius: 0 0 5px 5px;
+        border: solid 1px #7f7f7f;
+        border-top: none;
+      }
+      .contenu:not(:first-of-type) {
+        display: none;
+      }
+      .aide {
+        text-align: left;
+      }
+      .aide * {
+        margin: 0;
+      }
+      .aide p {
+        padding-left: 5px;
+      }
+      input[type='number'] {
+        width: 60px;
+        margin: 2px 0px;
+        font-size: 12pt;
+      }
+      .result {
+        text-align:center;
+        font-size: 18pt;
+        font-weight: bolder;
+        color: #780000;
+        user-select: none;
+        cursor: pointer;
+        text-shadow: 0 0 2px white, 0 0 2px white;
+      }
+      .result:hover {
+        color: #894db7;
+        text-shadow: 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00, 0 0 2px #feff00;
+      }
+      #tooltip {
+        position: absolute;
+        display: block;
+        width: 300px;
+        margin: auto;
+        color: #a91dd7;
+        font-weight: bold;
+        opacity: 0;
+        transition-property: opacity;
+        transition-duration: 1s;
+        transition-delay: 0s;
+        text-shadow: 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e, 0 0 2px #c4e53e;
+      }
+      .sep {
+        border: solid 1px #006e97;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+        margin: 10px 0;
+      }
+      canvas {
+        display: none;
+      }
+      ul.tab {
+        list-style-type: none;
+        margin: 0px;
+        padding: 0px;
+      }
+      .tab li {
+        display: inline-block;
+        margin: 0px;
+        padding: 5px 10px;
+        height: 25px;
+        cursor: default;
+        background-color: #d7e98e;
+        color: #00afef;
+        font-weight: bold;
+        line-height: 1.5em;
+        border: solid 1px #9f9f9f;
+        border-bottom: none;
+        border-right: none;
+        user-select: none;
+      }
+      .tab li:first-of-type {
+        border-radius: 5px 0 0 0;
+      }
+      .tab li:last-of-type {
+        border-radius: 0 5px 0 0;
+        border-right: solid 1px #9f9f9f;
+      }
+      .tab li:not(.selected):hover {
+        background-color: #ab0797;
+        cursor: pointer;
+      }
+      .tab li.selected {
+        background-color: #00afef;
+        color: #c4e53e;
+        border-color: #7f7f7f;
+        border-bottom: none;
+      }
+      table {
+        min-width: 100px;
+      }
+      td {
+        border: 1px solid black;
+        padding: 3px 8px;
+        font-weight: bold;
+      }
+      #contenu_vire p {
+        text-align: center;
+        margin: 5px 0;
+      }
+      .delvire {
+        text-decoration: none;
+      }
+      #delviren0.delvire {
+        visibility: hidden;
+      }
+      .vire:not(:last-of-type) .addvire {
+        visibility: hidden;
+      }
+      label {
+        display: inline-block;
+        font-size: 16pt;
+        font-weight: bolder;
+        margin:  0px 5px;
+        vertical-align: middle;
+      }
+      table {
+        margin: 10px auto;
+        background-color: white;
+      }
+      .pangle {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        background-image: 
+        url("data:image/svg+xml;utf8,<svg viewBox='0 0 24 24' height='24' width='24' fill='transparent' stroke='black' stroke-width='1' stroke-linecap='round' xmlns='http://www.w3.org/2000/svg'><g><path d='M20 2 L2 20 L22 20'/><path d='M 10,12 A 1, 2, 0 1 1 13, 20'/></g></svg>");
+      }
+      label.pangle {
+        margin-left: 15px;
+      }
+      a {
+        font-size: initial;
+        text-shadow: none;
+        text-decoration: none;
+      }
+      select {
+        float: right;
+        height: 32px;
+      }
+      h4 {
+        margin: 5px !important;
+        border-bottom: 1px solid #59005e;
+        padding-left: 12px;
+        color: #59005e;
+        background-color: #00bbff;
+      /*}
+      h4:not(:first-of-type) {*/
+        margin-top: 20px !important;
+      }
+      /*h4:before {
+        content: "\235F";
+        color: white;
+      }*/
+    </style>
+  </head>
+  <body>
+    <div id="zonepage">
+        <select onchange="changeunit(this.value)"><option value="m">m</option><option value="ft">ft</option></select>
+        <ul class="tab"><li class="selected">hauteur</li><li>vire</li><li title="aide sur l'utilisation"><!--&#x2753;-->&#128587;</li></ul>
+        <div id="contenu_hauteur" class="contenu">
+            <label for="dist1" title="distance de visée">&#x27F6;</label><input type="number" id="dist1" min="0" onchange="calcDist()" onkeyup="calcDist()" onClick="this.select()">
+            <label for="angle1" title="angle de visée" class="pangle">&nbsp;</label><input type="number" id="angle1" max="360" onchange="calcDist()" onkeyup="calcDist()" onClick="this.select()"><BR>
+            <label for="dist2" title="distance de visée">&#x27F6;</label><input type="number" id="dist2" min="0" onchange="calcDist()" onkeyup="calcDist()" onClick="this.select()">
+            <label for="angle2" title="angle de visée" class="pangle">&nbsp;</label><input type="number" id="angle2" max="360" onchange="calcDist()" onkeyup="calcDist()" onClick="this.select()"><BR>
+            <div class="sep"></div>
+            <p id="result_calc">
+                <span id="vert" class="result" data-title="verticale de l'objet">???</span><span id="haut" class="result" data-title="dimension de l'objet"></span><span id="rockdrop" class="result" data-title="rockdrop"></span><BR>
+                <span id="devers" class="result" data-title="devers/avancée"></span>
+                <span id="tooltip"></span>
+            </p>
+            <div class="sep"></div>
+            <a id="dl" href="#" onclick="dlCanvas(this)" download="graphlaser.png" title="clicker pour télécharger l'image">
+                <canvas id="drawzone" width="298" height="150"></canvas>
+            </a>
+        </div>
+        <div id="contenu_vire" class="contenu">
+            <div>
+                <div id="vire0" class="vire">
+                    <label for="distn0" title="distance de visée">&#x27F6;</label><input type="number" id="distn0" min="0" onchange="calcVire(this)" onkeyup="calcVire(this)" onClick="this.select()">
+                    <label for="anglen0" title="angle de visée" class="picto pangle">&nbsp;</label><input type="number" id="anglen0" max="360" onchange="calcVire(this)" onkeyup="calcVire(this)" onClick="this.select()">
+                    <a href="#" id="delviren0" class="delvire" onclick="removeVire(this)" title="supprimer cette vire">&#x274C;</a>
+                    <a href="#" class="addvire" onclick="addVire()" title="ajout autre vire">&#10133;</a>
+                </div>
+            </div>
+            <div class="sep"></div>
+            <table id="resvires"></table>
+        </div>
+        <div id="contenu_aide" class="contenu aide">
+            <p>
+                Cet outil permet de calculer la hauteur verticale d'un objet à partir d'un télémètre laser si celui-ci ne dispose pas de cette fonction.<BR>
+                Les valeurs calculées dépendent de la précision des mesures, elles-mêmes reposant en partie sur la qualité et le bon étalonnage du télémètre.
+            </p>
+            <h4>Hauteur</h4>
+            <p>
+                Viser une première fois le haut de l'objet à mesurer. Noter les deux valeurs mesurées dans les deux premiers champs <b>distance</b> (&#x27F6;) et <b>angle</b> (<span class="pangle">&nbsp;</span>) de visée.<BR>
+                Viser une seconde fois le bas de l'objet et noter les mesures dans les 2 champs suivants.<BR>
+                Les valeurs sont alors calculées:
+            </p>
+            <ul>
+                <li><b>verticale estimée</b> (symbole &#x2195;). Entre parenthèses est donnée la hauteur de l'objet (équivalente à sa verticale si l'objet est peu ou pas déversant/positif)</li>
+                <li><b>dévers/avancée</b> (symbole &#x27F7;)</li>
+                <li><b>rockdrop</b><sup>(1)</sup> à la verticale du point le plus haut (symbole &#x23F1;)</li>
+            </ul>
+            <h4>Vire</h4>
+            <p>
+                Au plus près de l'exit viser vers le bas l'extrémité de la première vire puis noter dans les champs les deux valeurs mesurées (l'angle est toujours considéré comme négatif).<BR>
+                Les valeurs d'avancée et de distance verticale de la vire ainsi que son rockdrop<sup>(1)</sup> sont alors calculées.<BR>
+                On peut rajouter des lignes de vire (bouton &#10133;), le tableau est automatiquement trié par distance verticale.
+            </p>
+            <h4></h4>
+            <p>
+                <b><small>(1)</small> <u>rockdrop</u></b> : il est estimé pour un sautant de 80 kg (PTV) en lisse, au niveau de la mer. De plus il ne tient pas compte de l'avancée du profil ou des vires/obstacles sur la trajectoire.<BR>
+                Il ne donne donc qu'une première idée, à adapter pour tenir compte de l'altitude et de votre poids/surface (WS/lisse...)
+            </p>
+        </div>
+    </div>
+    <script type="text/javascript">
+      function checkBrowser() {
+        "use strict";
+        
+        try { eval("var foo = (x)=>x+1"); }
+        catch (e) { return false; }
+        return true;
+      }
+      
+      if (!checkBrowser()) alert("Votre navigateur est obsolète.\nPour pouvoir utiliser cette application une version récente d'un navigateur moderne est requise.");
+    </script>
+
+    <script type="text/javascript">
+      let unitdist = 'm';
+
+      let $ = (selector, node) => Array.prototype.slice.call((node??document).querySelectorAll(selector));
+
+      function rockdrop(h) {
+        const g = 9.81;
+        const ro = 1.22;
+        // ### SANS FROTTEMENT (dans le vide)
+        //   https://education.lego.com/v3/assets/blt293eea581807678a/blt1af9a3ee12b5115a/5ec6401d7f28810f8451ded8/fr-ev3science-accelerationgravity-additionalinfo.pdf
+        //   h=1/2gt² ==> t=sqrt(2h/g)
+        // ### AVEC FROTTEMENTS
+        //   https://fr.wikipedia.org/wiki/Chute_avec_r%C3%A9sistance_de_l%27air#Application_num%C3%A9rique
+        let Cx = 0.45; // coefficient de trainée imaginé en lisse
+        let m = 80;  // 80 kg
+        let S = 1; // surface apparente, 1m²
+        /* pour vérifier les calculs de la page wikipedia avec la balle de tennis et la boule de pétanque
+        Cx = 0.57;m = 0.057;S = Math.PI*0.033*0.033;
+        console.log(rockdrop(7));
+        Cx = 0.45;m = 0.7;S = Math.PI*0.037*0.037;
+        console.log(rockdrop(7));*/
+        let V0 = Math.sqrt(2*m*g/(Cx*ro*S));
+        return (V0/g)*Math.acosh(Math.exp(h*Cx*ro*S/(2*m)));
+      }
+
+      /**
+       * loi des cosinus dans un triangle quelconque (c est le côté opposé à l'angle C) :
+       * c² = a² + b² - 2ab cos(C)
+       * https://www.maxicours.com/se/cours/trigonometrie-appliquee-aux-triangles-quelconques/
+       */
+      function calcDist(skiphash) {
+        let haut = -1;
+        let devers = -1;
+        let vert = -1;
+        let rdrop = -1;
+        let incl = '';
+        let a1 = parseFloat($('#angle1')[0].value);
+        let d1 = parseFloat($('#dist1')[0].value);
+        let a2 = parseFloat($('#angle2')[0].value);
+        let d2 = parseFloat($('#dist2')[0].value);
+        if (!isNaN(a1) && !isNaN(d1) && !isNaN(a2) && !isNaN(d2)) {
+          let hash = '#angle1='+a1+'&dist1='+d1+'&angle2='+a2+'&dist2='+d2;
+          if (history.replaceState) {
+            history.replaceState(null, '', hash);
+          } else {
+            window.location.hash = hash;
+          }
+          if(Math.abs(a1) != 180) a1 %= 180;
+          if(Math.abs(a2) != 180) a2 %= 180;
+          a1 = a1*Math.PI/180;
+          a2 = a2*Math.PI/180;
+          if (a2>a1) {
+            let a3 = a2;
+            let d3 = d2;
+            a2 = a1;
+            a1 = a3;
+            d2 = d1;
+            d1 = d3;
+          }
+          d1 = Math.abs(d1);
+          d2 = Math.abs(d2);
+          let angle = Math.abs(a1-a2);
+          let w1 = d1*Math.cos(a1);
+          let w2 = d2*Math.cos(a2);
+          let h1 = Math.sign(a1) * Math.sqrt(d1*d1 - (w1*w1));
+          let h2 = Math.sign(a2) * Math.sqrt(d2*d2 - (w2*w2));
+          haut = Math.round(Math.sqrt(d1*d1 + d2*d2 - 2*d1*d2*Math.cos(angle)));
+          devers = Math.sign(w1-w2) * Math.round(Math.abs(w2 - w1));
+          vert = Math.round(Math.abs(h2 - h1));
+          incl = devers==0?'vertical':devers>0?'positif':'négatif';
+          rdrop = Math.round(rockdrop(vert)*10)/10;
+          draw(a1, d1, a2, d2, w1, w2, h1, h2, haut);
+        } else {
+          draw();
+        }
+        if (haut >= 0) {
+          $('#vert')[0].innerHTML = `\u{2195}\xa0${vert}\xa0${unitdist}`;
+          $('#haut')[0].innerHTML = ` (${haut}\xa0${unitdist})`;
+          $('#rockdrop')[0].innerHTML = ` \u{23F1}\xa0${rdrop}\xa0s`;
+          $('#devers')[0].innerHTML = `\u{27F7}\xa0${devers.toString().replace("-","- ")}\xa0${unitdist} <small>(${incl})</small>`;
+        } else {
+          $('#haut')[0].innerHTML = "???";
+          $('#rockdrop')[0].innerHTML = $('#vert')[0].innerHTML = $('#devers')[0].innerHTML = "";
+        }
+      }
+
+      function draw(a1, d1, a2, d2, w1, w2, h1, h2, calc) {
+        let c = $("#drawzone")[0];
+        let ctx = c.getContext("2d");
+        const canvasw = c.width;//c.getBoundingClientRect().width;
+        const canvash = c.height;//c.getBoundingClientRect().height;
+        const padw = 10;
+        const padh = 10;
+
+        ctx.fillStyle = "#ff0000";
+        ctx.font = "12px sans-serif";
+        ctx.strokeStyle = "black";
+        //ctx.fillStyle = "#00afef";
+        ctx.fillStyle = "#6acbef";
+        ctx.fillRect(0, 0, canvasw, canvash);
+        
+        if (typeof a1 !== 'number') {
+          //ctx.fillText("???", padw+Math.min(w2,w1)+Math.abs(w2-w1)/2, canvash-padh-Math.min(h2,h1)-Math.abs(h2-h1)/2);
+          c.style.display= 'none';
+          return;
+        }
+
+        let angle = Math.round(180*Math.abs(a1-a2)/Math.PI);
+
+        let maxh = (Math.sign(h1) != Math.sign(h2)) ? Math.abs(h1)+Math.abs(h2) : Math.max(Math.abs(h1),Math.abs(h2));
+        let maxw = (Math.sign(w1) != Math.sign(w2)) ? Math.abs(w1)+Math.abs(w2) : Math.max(Math.abs(w1),Math.abs(w2));
+
+        let ratiow = Math.abs((canvasw-2*padw)/maxw);
+        let ratioh = Math.abs((canvash-2*padh)/maxh);
+        
+        // décommenter pour respecter le ratio w/h
+        ratiow = ratioh = Math.min(ratiow, ratioh);
+
+        w1 *= ratiow;
+        w2 *= ratiow;
+        h1 *= ratioh;
+        h2 *= ratioh;
+        maxw *= ratiow;
+        maxh *= ratioh;
+
+        let vert = Math.abs(h2-h1);
+        let devers = Math.abs(w2-w1);
+        
+        let dessintri = (devers/maxw > 0.05) && (vert/maxh > 0.05);
+
+        // décalage du point de visée en fonction des angles > verticalité ou horizontalité
+        let sy = canvash-padh;
+        if (a1 >= 0 && a2 <= 0) {
+          sy += h2;
+        } else if (a1 <= 0 && a2 <= 0) {
+          sy -= maxh;
+        }
+        let sx = padw;
+        if (w1 <= 0 && w2 >= 0) {
+          sx -= w1;
+        } else if (w1 <= 0 && w2 <= 0) {
+          sx += maxw;
+        }
+
+        // décalage du triangle en fonction de ses dimensions
+        let offsetx = -(maxw+2*padw-canvasw)/2;
+        let offsety = (maxh+2*padh-canvash)/2;
+
+        sx += offsetx;
+        sy += offsety;
+
+        // a1/d1
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(sx+w1, sy-h1);
+        ctx.stroke();
+
+        // a2/d2
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(sx+w2, sy-h2);
+        ctx.stroke();
+
+        ctx.strokeStyle = "green";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 3]);
+        
+        if (dessintri) {
+          // verticale
+          ctx.beginPath();
+          ctx.moveTo(sx+w1, sy-h1);
+          ctx.lineTo(sx+w1, sy-h2);
+          ctx.stroke();
+
+          // devers
+          ctx.beginPath();
+          ctx.moveTo(sx+w1, sy-h2);
+          ctx.lineTo(sx+w2, sy-h2);
+          ctx.stroke();
+        }
+
+        ctx.strokeStyle = "gray";
+
+        // hauteur
+        ctx.beginPath();
+        ctx.moveTo(sx+w2, sy-h2);
+        ctx.lineTo(sx+w1, sy-h1);
+        ctx.stroke();
+
+        ctx.lineWidth = 1;
+        ctx.setLineDash([]);
+
+        let radius=Math.min(15, d1*ratiow, d2*ratiow);
+        ctx.beginPath();
+        ctx.arc(sx, sy, radius, -a1, -a2, angle > 180);
+        if (angle != 180) angle %= 180;
+        ctx.stroke();
+        ctx.fillStyle = "#ff0000";
+        ctx.font = "10px sans-serif";
+        let tx = radius * Math.cos((a1+a2)/2);
+        let ty = radius * Math.sin((a1+a2)/2);
+        ctx.fillText(angle + '°', sx+tx, sy-ty);
+
+        ctx.font = "12px sans-serif";
+
+        // d1
+        let t = Math.round(d1) + '\xa0' + unitdist;
+        let s = ctx.measureText(t);
+        let textw = s.width;
+        let texth = 12;
+        let x = (sx+sx+w1)/2 - padw;
+        let y = (sy+sy-h1)/2 + padh;
+        ctx.fillStyle = '#f50';
+        ctx.fillRect(x, y+2, textw, -texth);
+        ctx.fillStyle = '#fff';
+        ctx.fillText(t, x, y);
+
+        // d2
+        t = Math.round(d2) + '\xa0' + unitdist;
+        s = ctx.measureText(t);
+        textw = s.width;
+        x = (sx+sx+w2)/2 - padw;
+        y = (sy+sy-h2)/2 + padh;
+        ctx.fillStyle = '#f50';
+        ctx.fillRect(x, y+2, textw, -texth);
+        ctx.fillStyle = '#fff';
+        ctx.fillText(t, x, y);
+
+        if (dessintri) {
+          // vert
+          x = sx+w1 - padw;
+          y = ((sy-h2) + (sy-h1))/3 + padh;
+          //y = ((sy-h2)/3 + 2*(sy-h1)/3)/2 + padh;
+          if (y <= canvash && x <= canvasw) {
+            t = Math.round(vert/ratioh) + '\xa0' + unitdist;
+            s = ctx.measureText(t);
+            textw = s.width;
+            ctx.fillStyle = 'green';
+            ctx.fillRect(x, y+2, textw, -texth);
+            ctx.fillStyle = '#fff';
+            ctx.fillText(t, x, y);
+          }
+        }
+
+        // devers
+        x = ((sx+w1) + (sx+w2))/2 - padw;
+        y = sy-h2 + padh + 3;
+        if (y <= canvash && x <= canvasw) {
+          t = Math.round(devers/ratiow) + '\xa0' + unitdist;
+          s = ctx.measureText(t);
+          textw = s.width;
+          //ctx.moveTo(sx+w1, sy-h2);
+          //ctx.lineTo(sx+w2, sy-h2);
+          ctx.fillStyle = 'green';
+          ctx.fillRect(x, y+2, textw, -texth);
+          ctx.fillStyle = '#fff';
+          ctx.fillText(t, x, y);
+        }
+
+        // hauteur
+        t = Math.round(calc) + '\xa0' + unitdist;
+        s = ctx.measureText(t);
+        textw = s.width;
+        x = (sx+w2 + (sx+w1))/2 - padw;
+        y = (sy-h2 + (sy-h1))/2 + padh;
+        ctx.fillStyle = 'gray';
+        ctx.fillRect(x, y+2, textw, -texth);
+        ctx.fillStyle = '#fff';
+        ctx.fillText(t, x, y);
+
+        c.style.display= 'block';
+      }
+
+      function calcVire(e) {
+        let num = e.parentElement.id.substring('vire'.length);
+        let anglen = parseFloat($('#anglen'+num)[0].value);
+        let distn = parseFloat($('#distn'+num)[0].value);
+        if (!isNaN(anglen) && !isNaN(distn)) {
+          let vn = Math.abs(Math.round(distn*Math.sin(anglen*Math.PI/180)));
+          let hn = Math.abs(Math.round(distn*Math.cos(anglen*Math.PI/180)));
+          let rdrop = Math.round(rockdrop(vn)*10)/10;
+          vires[num] = {'num':num, 'horz':hn, 'vert':vn, 'rdrop':rdrop};
+          updateVires();
+        }
+      }
+
+      function updateVires() {
+        let virestmp = vires.slice();
+        virestmp.sort((a,b) => a.vert - b.vert);
+        let resvires = $('#resvires')[0];
+        resvires.innerHTML = virestmp.filter(e => e.horz >= 0 && e.vert >= 0).map(e => `<tr><td><span id="vert${e.num}" title="distance à la verticale de la vire">-\xa0${e.vert}\xa0${unitdist}</span></td><td><span id="horz${e.num}" title="avancée de la vire">${e.horz}\xa0${unitdist}</span></td><td><span id="rdrop{e.num}" title="rockdrop à la verticale de la vire">${e.rdrop}\xa0s</span></td></tr>`).join('');
+      }
+
+      function addVire() {
+        let vire0 = $('#vire0')[0];
+        let newNode = vire0.cloneNode(true);
+        let num = vires.length;
+        updateIdSuffix(newNode, num);
+        $("input", newNode).forEach(i => i.value='');
+        vire0.parentElement.insertAdjacentElement('beforeend', newNode);
+        vires.push({'num':num, 'horz':-1, 'vert':-1, 'rdrop':-1});
+      }
+
+      function removeVire(e) {
+        let num = e.parentElement.id.substring('vire'.length);
+        if (num <=0) return;
+        vires.splice(num, 1);
+        $('#vire'+num)[0].remove();
+        let elem = null;
+        while ((elem = $('#vire'+(++num))[0]) != null) {
+          updateIdSuffix(elem, num-1);
+          continue;
+        }
+        updateVires();
+      }
+
+      function updateIdSuffix(node, newid) {
+        let regex = /\d+$/i;
+        if (typeof node.id === 'string') {
+          node.id = node.id.replace(regex, newid);
+        }
+        if (node.attributes && typeof node.attributes['for'] === 'object') {
+          node.attributes['for'].value = node.attributes['for'].value.replace(regex, newid);
+        }
+        if (node.childNodes) {
+          for (let i = 0; i < node.childNodes.length; i++) {
+            updateIdSuffix(node.childNodes[i], newid);
+          }
+        }
+      }
+
+      function clickCat(e) {
+        listemenus.forEach(e2 => e2.classList.remove("selected"));
+        e.target.classList.add("selected");
+        let t = listemenus.indexOf(e.target);
+        if (t >= 0) {
+          let zones = $('.contenu');
+          zones.forEach(z => z.style.display = 'none');
+          zones[t].style.display = 'block';
+        }
+      }
+
+      function displayTooltip(e) {
+        let target = e.target;
+        if (!e.target.classList.contains("result")) {
+          target = e.target.parentElement;
+        }
+        if (!target || target.innerText == '???' || !target.dataset) return;
+        let text = target.dataset.title;
+        if (typeof text === "string") {
+          showTooltip(text, e.type !== 'mouseover');
+        }
+      }
+
+      function showTooltip(text, hide) {
+        hide = typeof hide === 'boolean' ? hide : true;
+        hideTooltip();
+        let tt = $("#tooltip")[0];
+        tt.innerHTML = "-&nbsp;" + text + "&nbsp;-";
+        tt.style.opacity = "1";
+        if (hide) {
+          window.tttimer = window.setTimeout(function() {tt.style.opacity = "0";window.tttimer=null;}, 3000);
+        }
+      }
+      
+      function hideTooltip() {
+        if (typeof tttimer === "number")
+          window.clearTimeout(tttimer);
+        let tt = $("#tooltip")[0];
+        tt.style.opacity = "0";
+      }
+
+      function changeunit(unit) {
+        unitdist = unit;
+        calcDist();
+        updateVires();
+      }
+
+      function dlCanvas(e) {
+        let filename = e.download.replace(/\.[^/.]+$/, "");
+        filename = prompt("Entrez un nom pour le fichier", filename);
+        if (typeof filename !== 'string') {
+          event.preventDefault();
+          return;
+        }
+        e.download = filename && filename.trim().length>0 ? filename : "graphlaser";
+        let c = $("#drawzone")[0];
+        var dt = c.toDataURL('image/png');
+        e.href = dt;
+      }
+
+      function getHashParams() {
+        var hashParams = [];
+        var e,
+          a = /\+/g,  // Regex for replacing addition symbol with a space
+          r = /([^&;=]+)=?([^&;]*)/g,
+          d = function (s) { return decodeURIComponent(s.replace(a, " ")); },
+          q = window.location.hash.substring(1);
+
+        while (e = r.exec(q))
+          hashParams.push({'name':d(e[1]), 'value':d(e[2])});
+
+        return hashParams;
+      }
+
+      function initializeParamFromHash(p) {
+        let elem = $('#' + p.name)[0];
+        if (elem) {
+          elem.value = p.value;
+        }
+      }
+
+      function init() {
+        window.listemenus = $('.tab>li');
+        listemenus.forEach(e => e.addEventListener("click", clickCat));
+        $('#result_calc>span.result').forEach(e => {e.addEventListener("click", displayTooltip);e.addEventListener("mouseover", displayTooltip);e.addEventListener("mouseout", hideTooltip);});
+        window.vires = [{'num':0, 'horz':-1, 'vert':-1, 'rdrop':-1}];
+        if (window.location.hash.length > 0) {
+          getHashParams().forEach(initializeParamFromHash);
+          calcDist(true);
+        }
+      }
+      
+      window.onload = init;
+    </script>
+  </body>
+</html>
