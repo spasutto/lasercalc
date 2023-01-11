@@ -258,7 +258,7 @@
 
       let $ = (selector, node) => Array.prototype.slice.call((node??document).querySelectorAll(selector));
 
-      function rockdrop(h) {
+      function rockdrop(haut) {
         const g = 9.81;
         const ro = 1.22;
         // ### SANS FROTTEMENT (dans le vide)
@@ -275,7 +275,12 @@
         Cx = 0.45;m = 0.7;S = Math.PI*0.037*0.037;
         console.log(rockdrop(7));*/
         let V0 = Math.sqrt(2*m*g/(Cx*ro*S));
-        return (V0/g)*Math.acosh(Math.exp(h*Cx*ro*S/(2*m)));
+        let ttf = h => (V0/g)*Math.acosh(Math.exp(h*Cx*ro*S/(2*m)));
+        let t = ttf(haut-haut/3);
+        let rappv0 = (Math.round(Math.tanh(t/(V0/g))*100)/100);
+        console.log("Vitesse terminale de " + Math.round(V0*3.6) + "km/h " + (rappv0<1?"non acquise":"acquise") + " aux 2/3 de la chute, " + (Math.round(t*10)/10) + "s après le départ");
+        t = ttf(haut);
+        return t;
       }
 
       /**
