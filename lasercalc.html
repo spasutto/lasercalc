@@ -278,7 +278,7 @@
         let ttf = h => (V0/g)*Math.acosh(Math.exp(h*Cx*ro*S/(2*m)));
         let t = ttf(haut-haut/3);
         let rappv0 = Math.round(Math.tanh(t/(V0/g))*100);
-        console.log(rappv0+"% de la vitesse terminale (" + Math.round(V0*3.6) + "km/h) acquise aux 2/3 de la chute (" + Math.round(haut-haut/3) + "m), " + (Math.round(t*10)/10) + "s après le départ");
+        console.log(rappv0+"% de la vitesse terminale (" + Math.round(V0*3.6) + "km/h) atteints aux 2/3 de la chute (" + Math.round(haut-haut/3) + "m), " + (Math.round(t*10)/10) + "s après le départ");
         t = ttf(haut);
         return t;
       }
@@ -347,10 +347,11 @@
       function draw(a1, d1, a2, d2, w1, w2, h1, h2, calc) {
         let c = $("#drawzone")[0];
         let ctx = c.getContext("2d");
-        const canvasw = c.width;//c.getBoundingClientRect().width;
-        const canvash = c.height;//c.getBoundingClientRect().height;
+        const canvasw = c.width;
+        const canvash = c.height;
         const padw = 10;
-        const padh = 10;
+        const padt = 2;
+        let padb = 15;
 
         ctx.fillStyle = "#ff0000";
         ctx.font = "12px sans-serif";
@@ -360,7 +361,7 @@
         ctx.fillRect(0, 0, canvasw, canvash);
         
         if (typeof a1 !== 'number') {
-          //ctx.fillText("???", padw+Math.min(w2,w1)+Math.abs(w2-w1)/2, canvash-padh-Math.min(h2,h1)-Math.abs(h2-h1)/2);
+          //ctx.fillText("???", padw+Math.min(w2,w1)+Math.abs(w2-w1)/2, canvash-(padt+padb)-Math.min(h2,h1)-Math.abs(h2-h1)/2);
           c.style.display= 'none';
           return;
         }
@@ -371,7 +372,7 @@
         let maxw = (Math.sign(w1) != Math.sign(w2)) ? Math.abs(w1)+Math.abs(w2) : Math.max(Math.abs(w1),Math.abs(w2));
 
         let ratiow = Math.abs((canvasw-2*padw)/maxw);
-        let ratioh = Math.abs((canvash-2*padh)/maxh);
+        let ratioh = Math.abs((canvash-(padt+padb))/maxh);
         
         // décommenter pour respecter le ratio w/h
         ratiow = ratioh = Math.min(ratiow, ratioh);
@@ -389,11 +390,15 @@
         let dessintri = (devers/maxw > 0.05) && (vert/maxh > 0.05);
 
         // décalage du point de visée en fonction des angles > verticalité ou horizontalité
-        let sy = canvash-padh;
+        let sy = canvash-padb;
         if (a1 >= 0 && a2 <= 0) {
           sy += h2;
         } else if (a1 <= 0 && a2 <= 0) {
           sy -= maxh;
+        }
+        if (h2>10) {
+          padb = 10;
+          sy += padb;
         }
         let sx = padw;
         if (w1 <= 0 && w2 >= 0) {
@@ -404,7 +409,7 @@
 
         // décalage du triangle en fonction de ses dimensions
         let offsetx = -(maxw+2*padw-canvasw)/2;
-        let offsety = (maxh+2*padh-canvash)/2;
+        let offsety = (maxh+(padt+padb)-canvash)/2;
 
         sx += offsetx;
         sy += offsety;
@@ -422,7 +427,7 @@
         ctx.stroke();
 
         ctx.strokeStyle = "green";
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1.5;
         ctx.setLineDash([5, 3]);
         
         if (dessintri) {
@@ -450,7 +455,7 @@
         ctx.lineWidth = 1;
         ctx.setLineDash([]);
 
-        let radius=Math.min(15, d1*ratiow, d2*ratiow);
+        let radius=Math.min(35, d1*ratiow, d2*ratiow);
         ctx.beginPath();
         ctx.arc(sx, sy, radius, -a1, -a2, angle > 180);
         if (angle != 180) angle %= 180;
@@ -468,8 +473,8 @@
         let s = ctx.measureText(t);
         let textw = s.width;
         let texth = 12;
-        let x = (sx+sx+w1)/2 - padw;
-        let y = (sy+sy-h1)/2 + padh;
+        let x = (sx+sx+w1)/2 - textw/2;
+        let y = (sy+sy-h1)/2 + texth/2;
         ctx.fillStyle = '#f50';
         ctx.fillRect(x, y+2, textw, -texth);
         ctx.fillStyle = '#fff';
@@ -479,8 +484,8 @@
         t = Math.round(d2) + '\xa0' + unitdist;
         s = ctx.measureText(t);
         textw = s.width;
-        x = (sx+sx+w2)/2 - padw;
-        y = (sy+sy-h2)/2 + padh;
+        x = (sx+sx+w2)/2 - textw/2;
+        y = (sy+sy-h2)/2 + texth/2;
         ctx.fillStyle = '#f50';
         ctx.fillRect(x, y+2, textw, -texth);
         ctx.fillStyle = '#fff';
@@ -489,8 +494,8 @@
         if (dessintri) {
           // vert
           x = sx+w1 - padw;
-          y = ((sy-h2) + (sy-h1))/3 + padh;
-          //y = ((sy-h2)/3 + 2*(sy-h1)/3)/2 + padh;
+          y = ((sy-h2) + (sy-h1))/3 + padt;
+          //y = ((sy-h2)/3 + 2*(sy-h1)/3)/2 + padt;
           if (y <= canvash && x <= canvasw) {
             t = Math.round(vert/ratioh) + '\xa0' + unitdist;
             s = ctx.measureText(t);
@@ -504,7 +509,7 @@
 
         // devers
         x = ((sx+w1) + (sx+w2))/2 - padw;
-        y = sy-h2 + padh + 3;
+        y = sy-h2 + texth;
         if (y <= canvash && x <= canvasw) {
           t = Math.round(devers/ratiow) + '\xa0' + unitdist;
           s = ctx.measureText(t);
@@ -522,7 +527,7 @@
         s = ctx.measureText(t);
         textw = s.width;
         x = (sx+w2 + (sx+w1))/2 - padw;
-        y = (sy-h2 + (sy-h1))/2 + padh;
+        y = (sy-h2 + (sy-h1))/2 + padt;
         ctx.fillStyle = 'gray';
         ctx.fillRect(x, y+2, textw, -texth);
         ctx.fillStyle = '#fff';
