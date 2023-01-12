@@ -288,7 +288,7 @@
        * c² = a² + b² - 2ab cos(C)
        * https://www.maxicours.com/se/cours/trigonometrie-appliquee-aux-triangles-quelconques/
        */
-      function calcDist(skiphash) {
+      function calcDist(force) {
         let haut = -1;
         let devers = -1;
         let vert = -1;
@@ -300,6 +300,9 @@
         let d2 = parseFloat($('#dist2')[0].value);
         if (!isNaN(a1) && !isNaN(d1) && !isNaN(a2) && !isNaN(d2)) {
           let hash = '#angle1='+a1+'&dist1='+d1+'&angle2='+a2+'&dist2='+d2;
+          if (!force && window.location.hash == hash) {
+            return;
+          }
           if (history.replaceState) {
             history.replaceState(null, '', hash);
           } else {
