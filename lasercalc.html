@@ -467,7 +467,8 @@
         ctx.lineWidth = 1;
         ctx.setLineDash([]);
 
-        let radius=Math.min(35, d1*ratiow, d2*ratiow);
+        let radius=5+(1-(angle%180)/180)*30;
+        radius=Math.min(radius, d1*ratiow, d2*ratiow);
         ctx.beginPath();
         ctx.arc(sx, sy, radius, -a1, -a2, angle > 180);
         if (angle != 180) angle %= 180;
