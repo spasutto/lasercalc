@@ -299,16 +299,18 @@
         let d1 = parseFloat($('#dist1')[0].value);
         let a2 = parseFloat($('#angle2')[0].value);
         let d2 = parseFloat($('#dist2')[0].value);
+        let formatnum = n => isNaN(n)?'':n.toString();
+        let hash = '#angle1='+formatnum(a1)+'&dist1='+formatnum(d1)+'&angle2='+formatnum(a2)+'&dist2='+formatnum(d2);
+        let nochange  = window.location.hash == hash;
+        if (history.replaceState) {
+          history.replaceState(null, '', hash);
+        } else {
+          window.location.hash = hash;
+        }
+        if (!force && nochange) {
+          return;
+        }
         if (!isNaN(a1) && !isNaN(d1) && !isNaN(a2) && !isNaN(d2)) {
-          let hash = '#angle1='+a1+'&dist1='+d1+'&angle2='+a2+'&dist2='+d2;
-          if (!force && window.location.hash == hash) {
-            return;
-          }
-          if (history.replaceState) {
-            history.replaceState(null, '', hash);
-          } else {
-            window.location.hash = hash;
-          }
           if(Math.abs(a1) != 180) a1 %= 180;
           if(Math.abs(a2) != 180) a2 %= 180;
           a1 = a1*Math.PI/180;
@@ -644,7 +646,7 @@
           window.tttimer = window.setTimeout(hideTooltip, 3000);
         }
       }
-      
+
       function hideTooltip() {
         if (typeof tttimer === "number")
           window.clearTimeout(tttimer);
