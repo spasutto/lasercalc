@@ -191,8 +191,8 @@
             <label for="angle2" title="angle de visée" class="pangle">&nbsp;</label><input type="number" id="angle2" max="360" onchange="calcDist()" onkeyup="calcDist()" onClick="this.select()"><BR>
             <div class="sep"></div>
             <p id="result_calc">
-                <span id="vert" class="result" data-title="verticale de l'objet">???</span><span id="haut" class="result" data-title="dimension de l'objet"></span><span id="rockdrop" class="result" data-title="rockdrop"></span><BR>
-                <span id="devers" class="result" data-title="devers/avancée"></span>
+                <span id="vert" class="result" data-title="verticale de l'objet" data-emmode="vert">???</span><span id="haut" class="result" data-title="dimension de l'objet" data-emmode="haut"></span><span id="rockdrop" class="result" data-title="rockdrop" data-emmode="devers"></span><BR>
+                <span id="devers" class="result" data-title="devers/avancée" data-emmode="devers"></span>
                 <span id="tooltip"></span>
             </p>
             <div class="sep"></div>
@@ -255,6 +255,7 @@
 
     <script type="text/javascript">
       let unitdist = 'm';
+      let v = [];
 
       let $ = (selector, node) => Array.prototype.slice.call((node??document).querySelectorAll(selector));
 
@@ -332,6 +333,7 @@
           vert = Math.round(Math.abs(h2 - h1));
           incl = devers==0?'vertical':devers>0?'positif':'négatif';
           rdrop = Math.round(rockdrop(vert)*10)/10;
+          v = [];v.push(a1, d1, a2, d2, w1, w2, h1, h2, haut);
           draw(a1, d1, a2, d2, w1, w2, h1, h2, haut);
         } else {
           draw();
@@ -347,7 +349,7 @@
         }
       }
 
-      function draw(a1, d1, a2, d2, w1, w2, h1, h2, calc) {
+      function draw(a1, d1, a2, d2, w1, w2, h1, h2, calc, emmode) {
         let c = $("#drawzone")[0];
         let ctx = c.getContext("2d");
         const canvasw = c.width;
@@ -355,14 +357,16 @@
         const padw = 10;
         const padt = 2;
         let padb = 15;
+        let mode = null;
+        let font = "12px sans-serif";
 
         ctx.fillStyle = "#ff0000";
-        ctx.font = "12px sans-serif";
+        ctx.font = font;
         ctx.strokeStyle = "black";
         //ctx.fillStyle = "#00afef";
         ctx.fillStyle = "#6acbef";
         ctx.fillRect(0, 0, canvasw, canvash);
-        
+
         if (typeof a1 !== 'number') {
           //ctx.fillText("???", padw+Math.min(w2,w1)+Math.abs(w2-w1)/2, canvash-(padt+padb)-Math.min(h2,h1)-Math.abs(h2-h1)/2);
           c.style.display= 'none';
@@ -391,6 +395,7 @@
         let devers = Math.abs(w2-w1);
         
         let dessintri = (devers/maxw > 0.05) && (vert/maxh > 0.05);
+        if (!dessintri && emmode == "vert") emmode = "haut";
 
         // décalage du point de visée en fonction des angles > verticalité ou horizontalité
         let sy = canvash-padb;
@@ -430,7 +435,6 @@
         ctx.stroke();
 
         ctx.strokeStyle = "green";
-        ctx.lineWidth = 1.5;
         ctx.setLineDash([5, 3]);
         
         if (dessintri) {
@@ -438,12 +442,14 @@
           ctx.beginPath();
           ctx.moveTo(sx+w1, sy-h1);
           ctx.lineTo(sx+w1, sy-h2);
+          ctx.lineWidth = (emmode == "vert") ? 4 : 1.5;
           ctx.stroke();
 
           // devers
           ctx.beginPath();
           ctx.moveTo(sx+w1, sy-h2);
           ctx.lineTo(sx+w2, sy-h2);
+          ctx.lineWidth = (emmode == "devers") ? 4 : 1.5;
           ctx.stroke();
         }
 
@@ -453,6 +459,7 @@
         ctx.beginPath();
         ctx.moveTo(sx+w2, sy-h2);
         ctx.lineTo(sx+w1, sy-h1);
+        ctx.lineWidth = (emmode == "haut") ? 4 : 1.5;
         ctx.stroke();
 
         ctx.lineWidth = 1;
@@ -479,7 +486,7 @@
         let x = (sx+sx+w1)/2 - textw/2;
         let y = (sy+sy-h1)/2 + texth/2;
         ctx.fillStyle = '#f50';
-        ctx.fillRect(x, y+2, textw, -texth);
+        ctx.fillRect(x-1, y+2, textw+2, -texth);
         ctx.fillStyle = '#fff';
         ctx.fillText(t, x, y);
 
@@ -490,7 +497,7 @@
         x = (sx+sx+w2)/2 - textw/2;
         y = (sy+sy-h2)/2 + texth/2;
         ctx.fillStyle = '#f50';
-        ctx.fillRect(x, y+2, textw, -texth);
+        ctx.fillRect(x-1, y+2, textw+2, -texth);
         ctx.fillStyle = '#fff';
         ctx.fillText(t, x, y);
 
@@ -501,10 +508,11 @@
           //y = ((sy-h2)/3 + 2*(sy-h1)/3)/2 + padt;
           if (y <= canvash && x <= canvasw) {
             t = Math.round(vert/ratioh) + '\xa0' + unitdist;
+            ctx.font = ((emmode == "vert") ? "bold " : "") + font;
             s = ctx.measureText(t);
             textw = s.width;
             ctx.fillStyle = 'green';
-            ctx.fillRect(x, y+2, textw, -texth);
+            ctx.fillRect(x-1, y+2, textw+2, -texth);
             ctx.fillStyle = '#fff';
             ctx.fillText(t, x, y);
           }
@@ -520,8 +528,9 @@
           //ctx.moveTo(sx+w1, sy-h2);
           //ctx.lineTo(sx+w2, sy-h2);
           ctx.fillStyle = 'green';
-          ctx.fillRect(x, y+2, textw, -texth);
+          ctx.fillRect(x-1, y+2, textw+2, -texth);
           ctx.fillStyle = '#fff';
+          ctx.font = ((emmode == "devers") ? "bold " : "") + font;
           ctx.fillText(t, x, y);
         }
 
@@ -532,8 +541,9 @@
         x = (sx+w2 + (sx+w1))/2 - padw;
         y = (sy-h2 + (sy-h1))/2 + padt;
         ctx.fillStyle = 'gray';
-        ctx.fillRect(x, y+2, textw, -texth);
+        ctx.fillRect(x-1, y+2, textw+2, -texth);
         ctx.fillStyle = '#fff';
+        ctx.font = ((emmode == "haut") ? "bold " : "") + font;
         ctx.fillText(t, x, y);
 
         c.style.display= 'block';
@@ -615,8 +625,12 @@
         }
         if (!target || target.innerText == '???' || !target.dataset) return;
         let text = target.dataset.title;
+        let emmode = target.dataset.emmode;
         if (typeof text === "string") {
           showTooltip(text, e.type !== 'mouseover');
+        }
+        if (typeof emmode === "string") {
+          draw(...v, emmode);
         }
       }
 
@@ -627,15 +641,17 @@
         tt.innerHTML = "-&nbsp;" + text + "&nbsp;-";
         tt.style.opacity = "1";
         if (hide) {
-          window.tttimer = window.setTimeout(function() {tt.style.opacity = "0";window.tttimer=null;}, 3000);
+          window.tttimer = window.setTimeout(hideTooltip, 3000);
         }
       }
       
       function hideTooltip() {
         if (typeof tttimer === "number")
           window.clearTimeout(tttimer);
+        window.tttimer=null;
         let tt = $("#tooltip")[0];
         tt.style.opacity = "0";
+        draw(...v);
       }
 
       function changeunit(unit) {
